@@ -1,0 +1,122 @@
+#!/bin/ash
+set -eu
+: ${IFS//_/_} || exit # exit if not supported
+
+###o=${0##*[/\\]} # o = $0
+o=${0##*["${PATHSEP:-/}"]} # o = $0
+_rsudo_print=''
+_rsudo_user=Administrator
+_rsudo_no_cmd=''
+_rsudo_keep='' # pause on error
+_rsudo_line=''
+_rsudo_background=''
+_rsudo_clink=''
+_rsudo_args=''
+
+err() {
+	echo >&2 "$o: $1"
+	[ "${2:-1}" -eq 0 ] || exit "${2:-1}"
+}
+
+while :; do
+	[ $# != 0 ] || {
+		[ "$_rsudo_clink" != '' ] && break
+		err "too less args, use --help for usege"
+	}
+	case $1 in
+		--) shift; [ $# = 0 ] || break;;
+		-P|--print) _rsudo_print=1;;
+		-u|--user) shift; _rsudo_user=$1;;
+		-U|--same-user) _rsudo_user=$(id -un) || _rsudo_user=${USER:?};;
+
+		-b|--background) _rsudo_background=1;;
+		/c|--close) _rsudo_keep=c;;
+		-k|/k|--keep) _rsudo_keep=k;;
+		--no-cmd) _rsudo_no_cmd=1;;
+		-p|--pause) _rsudo_keep=p;;
+		-pp) _rsudo_keep=pp;;
+		-c|--exec) shift; exec runas.exe /user:"$_rsudo_user" "$@"; exit;;
+		--clink) _rsudo_clink=1;;
+
+		--help|-h)
+			printf %s\\n \
+				"Usage: $o [-P|-print] [-u user|-U] [-b|/c|-k|/k|--no-cmd|-p] [--] <command>" \
+				"       $o [-P|-print] [-u user|-U] <--clink> [--] [command]" \
+				"       $o [-u user|-U] <-c> <command>" \
+				"" \
+				"   --print                print the command" \
+				"   -u, --user=user        run command as specified user name" \
+				"   -U, --same-user        use the current user" \
+				"" \
+				"   -b, --background       do not open terminal winow (uses silentcmd.exe) (ignores -k -c and -p options)" \
+				"   /c, --close            close the cmd window" \
+				"   -k, /k, --keep         don't close the cmd window" \
+				"   --no-cmd               don't use cmd wrapper, (won't cd to pwd)" \
+				"   -p, --pause            pause on error, this is default. (-pp for always pause)"\
+				"   -c, --exec             execute command as is" \
+				"   --clink                execute the clink.bat and keep cmd open" \
+				"" \
+				"   --help                 prit this message" \
+				"   --                     end of arguments" \
+				"" \
+				"   ( note: arguments combined '-buUSER' are not supported at the momment )" \
+			;
+			exit
+		;;
+		-*) err "unknown argument '$1'";;
+		*) break;;
+	esac
+	shift
+done
+
+# NOTE: PWD is still with forward slashes, Windows is backwards bus still works
+
+_rsudo_cd="cd \"${PWD//"\""/"\"^\"\""}\""
+_rsudo_args=$(
+	for i; do
+		printf ' "%s"' "${i//"\""/"\"^\"\""}"
+		# "fix
+	done
+)
+_rsudo_args=${_rsudo_args#" "}
+
+# todo when  _rsudo_line is not just '' or 'silentcmd.exe ', then track every line
+
+if [ "$_rsudo_background" = 1 ]; then
+	[ "$_rsudo_keep:$_rsudo_clink" = c: ] \
+	|| err 'Ignoring --keep or --clink because --background has been used' 0
+	[ "$_rsudo_line" = '' ] || err '$_rsudo_line var shoud not be set' 3 # internal error
+	_rsudo_line="silentcmd.exe $_rsudo_cd && $_rsudo_args"
+elif [ "$_rsudo_clink" = 1 ]; then
+	case "$_rsudo_keep:$_rsudo_no_cmd" in 
+		pp:|p:|k:) ;;  # --keep and --pause is still accepable
+		*) err "don't use --clink with --no-cmd or --colose options";;
+	esac
+	# needs cd -> '"C:\Program' is not recognized
+	_rsudo_line=\
+'cmd /k'\
+" ${_rsudo_cd:-cd .}"\
+' && "C:\Program Files (x86)\clink\0.4.9\clink.bat" inject --autorun --profile '"\"${HOME//"\""/"\"^\"\""}\"}\\clink \""\
+"${_rsudo_line:+ && $_rsudo_line}"\
+"${_rsudo_args:+ && $_rsudo_args}"\
+	;
+elif [ "$_rsudo_no_cmd" = 1 ]; then
+	# WON'T cd!
+	_rsudo_line=$_rsudo_line"\""${1//"\""/"\"^\"\""}"\""
+	shift
+else
+	case "$_rsudo_keep" in
+		p)      _rsudo_line=$_rsudo_line"cmd /c $_rsudo_cd && $_rsudo_args || pause";;
+		pp)     _rsudo_line=$_rsudo_line"cmd /c $_rsudo_cd && $_rsudo_args && pause || pause";;
+		[KkCc]) _rsudo_line=$_rsudo_line"cmd /$_rsudo_keep $_rsudo_cd && $_rsudo_args ";;
+		*) _rsudo_line=$_rsudo_line"cmd /c $_rsudo_cd && $_rsudo_args ";;
+	esac
+fi
+
+(
+	[ "$_rsudo_print" = '' ] || set -x
+	runas.exe \
+		/user:"$_rsudo_user" \
+		"$_rsudo_line" \
+	;
+) | cat; # durty fix: 'cat' used to hide 2nd line 'Attempting to start cmd'...
