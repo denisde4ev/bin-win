@@ -1,0 +1,49 @@
+#!/bin/sh
+set -eu
+
+# note: command-inplace and xargs-inplace shares some codebase
+# if you edit this consider if that change should be added to other command too
+
+
+case $1 in --help)
+	printf %s\\n >&2 \
+		"Usage: ${0##*/} --command=<COMMAND> <... files>" \
+		"  pipe files one by one to COMMAND and save it to temp file" \
+		"  and then (if exit status is 0) overwrites file" \
+	;
+	exit
+#
+#
+#
+#
+#
+#
+esac
+
+unset command
+while case $# in 0) false; esac; do
+	case $1 in
+		--command=*) command=${1##*=};;
+		--command|-c) command=${2}; shift;;
+		-c*) command=${1#"-c"};;
+		--) shift; break;;
+		-*) printf %s\\n "unrecognized option: $1" >&2; exit 2;;
+		*) break;;
+	esac
+	shift
+done
+
+case ${command-} in '') printf %s\\ "missing COMMAND, see --help for usage" >&2; exit 2; esac
+
+for file; do
+	eval "$command" < "$file" > "$file~i.$$~" || {
+		printf %s\\n "${0##*/}: for file '$file' command eval exit status: $?"
+		rm -v -- "$file~i.$$~"
+		continue
+	}
+
+	case ${MV_COMMAND_SUPPORTS_ARGT+T} in T) ;; *)
+		[ ! -d "$file" ] || rm -v -- "$file" || continue
+	esac
+	mv -vf${MV_COMMAND_SUPPORTS_ARGT+T} -- "$file~i.$$~" "$file"
+done
