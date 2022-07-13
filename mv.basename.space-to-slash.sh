@@ -17,10 +17,10 @@ dir_andsep=${i%"$base"} # dir in most causes will be empty
 case ${MV_SUPPORTS_ARG_T+T} in T) ;; *) # when does not support
 	[ ! -e "$dir_andsep${base// /-}" ] || {
 		printf %s\\n >&2 \\
-			"file exists and mv does not support T arg (and cant't detect if --interactive flag used)" \
+			"target file exists and mv does not support T arg (and cant't detect if --interactive flag used)" \
 			"wont move to existing: '$dir_andsep${base// /-}'" \
 		;
 		exit 3
 	}
 esac
-mv ${MV_SUPPORTS_ARG_T+"-T"} "$@" -- "$i" "$dir_andsep${base// /-}";;
+mv ${MV_SUPPORTS_ARG_T+"-T"} "$@" -- "$i" "$dir_andsep${base// /-}"
