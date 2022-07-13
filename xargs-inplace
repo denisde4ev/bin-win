@@ -35,6 +35,9 @@ done
 
 case $# in 0) printf %s\\ "missing COMMAND, see --hepl for usage" >&2; exit 2; esac
 
+# note: -d option is not POSIx but most shells supports it.
+# Don't detect, just leave it like this,
+# error message should be correct and will exit with non zero.
 while IFS= read -r ${null_data+-d ''} file; do
 	"$@" < "$file" > "$file~i.$$~" || {
 		printf %s\\n "${0##*/}: for file '$file' command eval exit status: $?"
