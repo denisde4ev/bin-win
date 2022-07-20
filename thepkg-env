@@ -1,0 +1,7 @@
+#!/bin/sh
+
+exec env THEPKG_PREFIX=${THEPKG_PREFIX-'C:/~/usr'} "$@"
+
+# #export THEPKG_PREFIX=${THEPKG_PREFIX-'C:/Users/pc57/AppData/Local/Temp/thepkg'}
+#export THEPKG_PREFIX=${THEPKG_PREFIX-'C:/~/usr'}
+# #exec /^/\ https://github.com/denisde4ev/thepkg/raw/master/thepkg "$@"

@@ -1,0 +1,49 @@
+#!/bin/sh
+set -euf
+IFS='
+'
+[ -d '/\.\C:\Windows' ] || ( cd / && [ "$PWD" = 'C:/' ] ) || exit # BusyBox-w32
+
+_runinbash_arg0=${0##*["{${PATHSEP:-"/"}"]}
+_runinbash_arg0=${_runinbash_arg0%.sh}
+_runinbash_arg1=''
+_runinbash_args=''
+
+case $_runinbash_arg0 in
+	C@) # when using C:/.../... paths
+		cd /
+	;;
+	?*@) # (xi$ ..) -> (bash -xi ..)
+		_runinbash_args=-${_runinbash_arg0%"@"}
+	;;
+
+	@wsl|@bash|RunInBash|*[!a-zA-Z0-9'@%+:,._-']*|@) ;; # not for next match
+	# does quoteing in case work in any shell ?
+	[a-zA-Z_@]*)
+		_runinbash_arg1=$_runinbash_arg0
+	;;
+esac
+
+
+
+[ "$_runinbash_arg1" != '' ] || {
+	[ $# -eq 0 ] && exec bash.exe ${_runinbash_args:+"$_runinbash_args"}
+	_runinbash_arg1=$1; shift
+}
+
+[ $# -ne 0 ] || _runinbash_arg1=$_runinbash_arg1' #'
+
+arg "$@"
+
+arg exec wsl -e ${_runinbash_args:+"$_runinbash_args"} -c "$_runinbash_arg1 \"\$@\"" bash "$@"
+exit 111
+###exec bash.exe ${_runinbash_args:+"$_runinbash_args"} -c "$_runinbash_arg1 \"\$@\"" bash "$@"
+
+
+
+echo bug in bash.exe >&2
+echo todo: fix me >&2
+exit 127
+
+exec bash.exe ${_runinbash_args:+"$_runinbash_args"} -c "$_runinbash_arg1 \"\$@\"" bash "$@"
+# warn: bash.exe  can not send empty/null argument (set -- '') -> 'The parameter is incorrect.' 

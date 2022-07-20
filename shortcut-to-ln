@@ -1,0 +1,60 @@
+#!/bin/sh
+set -eu
+
+case ${OS:-$(uname)} in *[Ww]indows*)
+	case $(id -u) in 0) ;; *)
+		exec sudo sh "$0" "$@"; exit # fixes my bug: shell scripts are not self executable
+	esac
+esac
+
+
+# TODO:
+# help message and --relative option
+# --verbose option
+# 
+
+
+
+case $# in 0) set -- ./*.lnk; esac
+
+fail() {
+	printf %s\\n "${0##*/}: failed($?) to $1" >&2
+	failed_cout=$(( failed_cout + ${2:-1} ))
+}
+
+case $# in 0) printf %s\\n "empty dir, see --help for usage" >&2; exit; esac
+
+
+failed_cout=0
+for i; do
+	# todo: test if will accept ./ and /.//C:/path/to\\link.lnk
+	shortcut_q=$(Shortcut.exe /A:Ql /F:"$i") || {
+		fail "get query link $i"
+		continue
+	}
+
+	# TODO: get target_dir
+	# and if target_dir is pwd, then ask if should be linked to relative or absolute path
+
+	targetpath=$(printf %s\\n "$shortcut_q" | sed -ne '/TargetPath=/ { s/^[^=]*=//p; q; }') && [ "$i" != '' ] || {
+		fail "get targetpath for link $i"
+		continue
+	}
+
+	ln -sn -- "$targetpath" "${i%.lnk}" || {
+		fail "create link: $ ln -sn -- '$targetpath' '${i%.lnk}'"
+		continue
+	}
+
+	rm -- "$i" || fail "failed to remove old link: \$i='$i'"
+done
+
+
+case $failed_cout:$# in
+	0:*) exit;;
+	*:1) exit "$failed_cout";;
+	*)
+		printf %s\\n "$failed_cout links failed to be created" >&2
+		exit 1
+	;;
+esac
