@@ -1,0 +1,51 @@
+#!/bin/sh
+set -eu
+
+
+
+# TODO:
+# help message and --relative option
+# --verbose option
+# 
+
+
+o=${0##*/}
+case $# in 0) set -- ./*.lnk; esac
+
+fail() {
+	printf %s\\n "${0##*/}: failed($?) to $1" >&2
+	failed_cout=$(( failed_cout + ${2:-1} ))
+}
+
+case $# in 0) printf %s\\n "empty dir, see --help for usage" >&2; exit; esac
+
+
+failed_cout=0
+for i; do
+	# todo: test if will accept ./ and /.//C:/path/to\\link.lnk
+	shortcut_q=$(Shortcut.exe /A:Ql /F:"$i") || {
+		fail "get query link $i"
+		continue
+	}
+
+	# cleanup empty lines and 1 outpt log
+	shortcut_q=$(printf %s\\n "$shortcut_q" | grep -v '^$' | grep -vFw 'The command completed successfully.')
+	
+
+	if printf %s\\n "$shortcut_q" > "${i}.source"; then
+		printf %s\\n >&2 "${o}: ok: '${i}.source'"
+	else
+		fail "to write to '${i}.source' file, \$?=$?"
+		#continue
+	fi
+done
+
+
+case $failed_cout:$# in
+	0:*) exit;;
+	*:1) exit "$failed_cout";;
+	*)
+		printf %s\\n "$failed_cout links failed to be created" >&2
+		exit 1
+	;;
+esac

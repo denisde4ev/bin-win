@@ -1,0 +1,12 @@
+[killall.lnk]
+TargetPath=C:\ProgramData\chocolatey\bin\busybox64.exe
+TargetPathExpanded=C:\ProgramData\chocolatey\bin\busybox64.exe
+Arguments=killall
+ArgumentsExpanded=killall
+WorkingDirectory=C:\~\,\bin
+WorkingDirectoryExpanded=C:\~\,\bin
+RunStyle=7
+IconLocation=,0
+IconLocationExpanded=,0
+HotKey=0 (None)
+Description=

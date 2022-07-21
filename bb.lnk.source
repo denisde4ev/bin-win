@@ -1,0 +1,12 @@
+[bb.lnk]
+TargetPath=C:\ProgramData\chocolatey\bin\busybox64.exe
+TargetPathExpanded=C:\ProgramData\chocolatey\bin\busybox64.exe
+Arguments=
+ArgumentsExpanded=
+WorkingDirectory=C:\ProgramData\chocolatey\bin
+WorkingDirectoryExpanded=C:\ProgramData\chocolatey\bin
+RunStyle=1
+IconLocation=,0
+IconLocationExpanded=,0
+HotKey=0 (None)
+Description=

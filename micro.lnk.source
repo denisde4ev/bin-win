@@ -1,0 +1,12 @@
+[micro.lnk]
+TargetPath=C:\ProgramData\chocolatey\bin\micro.exe
+TargetPathExpanded=C:\ProgramData\chocolatey\bin\micro.exe
+Arguments=
+ArgumentsExpanded=
+WorkingDirectory=C:\ProgramData\chocolatey\bin
+WorkingDirectoryExpanded=C:\ProgramData\chocolatey\bin
+RunStyle=1
+IconLocation=C:\~\usr\share\icons\hicolor\scalable\apps\AnyConv.com__micro-logo-mark.ico,0
+IconLocationExpanded=C:\~\usr\share\icons\hicolor\scalable\apps\AnyConv.com__micro-logo-mark.ico,0
+HotKey=0 (None)
+Description=

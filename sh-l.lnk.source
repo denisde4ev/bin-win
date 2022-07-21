@@ -1,0 +1,12 @@
+[sh-l.lnk]
+TargetPath=C:\ProgramData\chocolatey\bin\busybox64.exe
+TargetPathExpanded=C:\ProgramData\chocolatey\bin\busybox64.exe
+Arguments=sh -l
+ArgumentsExpanded=sh -l
+WorkingDirectory=C:\ProgramData\chocolatey\bin
+WorkingDirectoryExpanded=C:\ProgramData\chocolatey\bin
+RunStyle=1
+IconLocation=,0
+IconLocationExpanded=,0
+HotKey=0 (None)
+Description=
