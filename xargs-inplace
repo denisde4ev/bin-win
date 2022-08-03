@@ -7,15 +7,17 @@ set -eu
 
 case $1 in --help)
 	printf %s\\n >&2 \
-		"Usage: ${0##*/} [-0] <COMMAND> [... command args]" \
+		"Usage: ${0##*/} --command=<COMMAND> <file>..." \
+		"       ${0##*/} -c <COMMAND> <file>..." \
 		"  read files from stdin" \
 		"  pipe files one by one to COMMAND and save it to temp file" \
 		"  and then (if exit status is 0) overwrites file" \
 		"" \
 		"Options:" \
-		"  -0 Input is separated by NULs" \
+		"  -c|--command  command to execute " \
+		"  -0            Input is separated by NULs" \
 		"" \
-		"This command unlike xargs will will not the COMMAND if input is empty (does not have -r option)" \
+		"This command unlike xargs will will not execute the COMMAND if input is empty (does not have -r option)" \
 	;
 	exit
 esac
@@ -39,6 +41,7 @@ case $# in 0) printf %s\\ "missing COMMAND, see --hepl for usage" >&2; exit 2; e
 # Don't detect, just leave it like this,
 # error message should be correct and will exit with non zero.
 while IFS= read -r ${null_data+-d ''} file; do
+
 	"$@" < "$file" > "$file~i.$$~" || {
 		printf %s\\n "${0##*/}: for file '$file' command eval exit status: $?"
 		rm -v -- "$file~i.$$~"

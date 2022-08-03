@@ -7,17 +7,19 @@ set -eu
 
 case $1 in --help)
 	printf %s\\n >&2 \
-		"Usage: ${0##*/} --command=<COMMAND> <... files>" \
+		"Usage: ${0##*/} --command=<COMMAND> <file>..." \
+		"       ${0##*/} -c <COMMAND> <file>..." \
+		\
 		"  pipe files one by one to COMMAND and save it to temp file" \
 		"  and then (if exit status is 0) overwrites file" \
+		"" \
+		"Options:" \
+		"  -c|--command  command to execute " \
+		\
+		\
+		\
 	;
 	exit
-#
-#
-#
-#
-#
-#
 esac
 
 unset command
@@ -39,6 +41,7 @@ case ${command-} in '') printf %s\\ "missing COMMAND, see --help for usage" >&2;
 #
 #
 for file; do
+	# TODO: add  trap to remov file
 	eval "$command" < "$file" > "$file~i.$$~" || {
 		printf %s\\n "${0##*/}: for file '$file' command eval exit status: $?"
 		rm -v -- "$file~i.$$~"
