@@ -1,0 +1,61 @@
+#!/bin/ash
+cal "$@"|{
+set -eu
+IFS=''
+read -r i;printf %s\\n "$i"; # print header date
+
+err(){ printf %s\\n "${0##*/}: $1" 1>&2; exit "${2:-0}"; }
+# assume is 
+###buf='';
+read -r line
+case $line in
+	'Su Mo'*) rex=???;;
+	'Su  Mo'*) rex=????;;
+	'Su   Mo'*) rex=?????;;
+	*) err 'not valid';;
+esac
+
+w=${line#$rex}
+su=${line%"$w"}
+su=${su%" "}
+printf %s\\n "$w $su"
+
+read -r line
+w=${line#$rex}
+su=${line%"$w"}
+su=${su%" "}
+case $su in
+	'  ')
+		last_w=$w
+		while read -r line;do
+			w=${line#$rex}
+			su=${line%"$w"}
+			su=${su%" "}
+
+			printf %s\\n "$last_w $su"
+			last_w=$w
+
+		done
+		printf %s\\n "$w"
+
+	;; # nothing to print
+	# printf %s\\n "$w $su"; # first line Su is empty
+	' 1') # add padstart
+		last_w=${w//?/" "} # replace all to space, note not POSIX
+
+		while :;do
+
+			printf %s\\n "$last_w $su"
+			read -r line || break
+			last_w=$w
+			w=${line#$rex}
+			su=${line%"$w"}
+			su=${su%" "}
+		done
+		printf %s\\n "$w"
+		
+	;;
+	*) err "invalid first line: $su";;
+esac
+
+}
