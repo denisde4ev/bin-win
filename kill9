@@ -1,0 +1,7 @@
+#!/bin/sh
+
+IFS='
+'
+set -f
+
+taskkill /F $(for i; do echo /PID; printf %s\\n "$i"; done)

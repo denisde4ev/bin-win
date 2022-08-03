@@ -1,0 +1,25 @@
+#!/bin/sh
+
+# inteded for interactive shell 
+# this script cd's to new temp path and extracts git repo (no history no long time waiting)
+# note: do not use `exit` or any bad for interactive shell actions
+
+case ${1?} in
+--help)
+	printf %s\\n "Usage ${0##*/} <url> [unxip args]..."
+	exit
+	;;
+--)
+	shift
+	;;
+-*)
+	printf %s\\n >&2 "${0##*/}: does not support aguments, see --help for usage"
+	exit 2
+esac
+
+cd "$(mktemp -d -t tmp.shpid$$.XXXXXX)" || exit
+
+url=$1; shift
+case $# in 0) set -- -; esac
+curl -L "$1" | unzip "$@"
+cd * || :

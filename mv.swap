@@ -1,0 +1,31 @@
+#!/bin/sh
+set -eu
+
+case $1 in --help) echo >&2 todo help message; exit; esac
+
+o=${0##*/}
+err() {
+	printf %s\\n "$o: $1" >&2;
+	exit "${2-2}"
+}
+
+case $1 in
+	-*) err "argument 1 should not be an option, got: $1";;
+esac
+case $2 in
+	-*) err "argument 2 should not be an option, got: $2";;
+esac
+case ${3-} in
+	-*|'') ;;
+	*) err "argument 3 and so on, must be an option or non specifyed, got: ${3+'}${3-NULL}${3+'}";;
+esac
+
+s=$1
+t=$2
+shift 2
+
+set -x
+
+mv "$@" "$s" "$t~$o-$$~"
+mv "$@" "$t" "$s"
+mv "$@" "$t~$o-$$~" "$t"

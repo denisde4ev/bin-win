@@ -1,0 +1,4 @@
+#!/bin/sh
+
+echo nothing done here >&2
+exit 123

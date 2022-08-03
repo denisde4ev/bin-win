@@ -28,13 +28,14 @@ case $# in
 	2) i=$2; set -- "$1";; # most of the times -> expected from my `alias micro-diff='\micro-diff --color=auto'`
 	*) . ~/B/__sourceable/pop_to_i.sh;;
 esac
+path=$i
 
-
-unset j
-case $i in /*|"$HOMEDRIVE"/*) j=$i;; *) j=$PWD/$i; esac
+PWDDRIVE=${PWD%%["${PATHSEP:-/}"]*}
+unset diff_path
+case $path in /*|"$PWDDRIVE"/*) diff_path=$path;; *) diff_path=$PWD/$path; esac # todo: path does not detects all drives such as [A-Za-z]:/* , but should it do it?
 
 
 case $o in
-	micro-diff)    exec diff               "$@" "$i" ~/.config/micro/backups/"${j//[\/\:]/"%"}";;
-	micro-diff-?*) exec "${o#micro-diff-}" "$@"      ~/.config/micro/backups/"${j//[\/\:]/"%"}";;
+	micro-diff)    exec diff               "$@" "$path" ~/.config/micro/backups/"${diff_path//[\/\:]/"%"}";;
+	micro-diff-?*) exec "${o#micro-diff-}" "$@"         ~/.config/micro/backups/"${diff_path//[\/\:]/"%"}";;
 esac

@@ -1,0 +1,64 @@
+#!/bin/sh
+
+echo >&2 "cound not get this to work properly"\!
+exit 127
+
+#!C:/Users/pc57/usr/bin/C@.sh jq -R -s -f
+
+
+
+# does not work:
+## 
+## # Requires: jq 1.5
+## 
+## # objectify/1 expects an array of atomic values as inputs, and packages
+## # these into an object with keys specified by the "headers" array and
+## # values obtained by trimming string values, replacing empty strings
+## # by null, and converting strings to numbers if possible.
+## def objectify(headers):
+##   def tonumberq: tonumber? // .;
+##   def trimq: if type == "string" then sub("^ +";"") | sub(" +$";"") else . end;
+##   def tonullq: if . == "" then null else . end;
+##   . as $in
+##   | reduce range(0; headers|length) as $i
+##       ({}; .[headers[$i]] = ($in[$i] | trimq | tonumberq | tonullq) );
+## 
+## def csv2jsonHelper:
+##   .[0] as $headers
+##   | reduce (.[1:][] | select(length > 0) ) as $row
+##       ([]; . + [ $row|objectify($headers) ]);
+## 
+## csv2jsonHelper
+
+
+
+
+
+
+# src: https://stackoverflow.com/a/32002086
+###
+## MOSTLY work but does not count "," as excaped !
+## and seems to stop after first line!!!
+###
+###
+#### objectify/1 takes an array of string values as inputs, converts
+#### numeric values to numbers, and packages the results into an object
+#### with keys specified by the "headers" array
+###def objectify(headers):
+###  # For jq 1.4, replace the following line by: def tonumberq: .;
+###  def tonumberq: tonumber? // .;
+###  . as $in
+###  | reduce range(0; headers|length) as $i ({}; .[headers[$i]] = ($in[$i] | tonumberq) );
+###
+###def csv2table:
+###  # For jq 1.4, replace the following line by:  def trim: .;
+###  def trim: sub("^ +";"") |  sub(" +$";"");
+###  split("\n") | map( split(",") | map(trim) );
+###
+###def csv2json:
+###  csv2table
+###  | .[0] as $headers
+###  | reduce (.[1:][] | select(length > 0) ) as $row
+###      ( []; . + [ $row|objectify($headers) ]);
+###
+###csv2json

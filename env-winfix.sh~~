@@ -1,0 +1,6 @@
+#!/bin/sh
+
+set -f
+IFS='
+'
+env $(env | sed '/=C:\// s/\//\\/g') "PATH=$PATH" "$@"

@@ -1,0 +1,44 @@
+#!/bin/sh
+set -u
+
+sleep='10'
+case ${1:-} in '');;
+	[0-9]*|.[0-9]*) sleep=$1; shift;; # arg looks lake num or 1m or .1
+	-h|--help)
+		printf %s\\n \
+			"Usage ${0##*/} [timeout for temp file]" \
+			'  1. save stdin to temp file' \
+			'  2. echo path to temp file' \
+			'  3. remove temp file after timeout (retry if rm fails)' \
+			'' \
+			"  default timeout: $sleep" \
+		;
+		exit
+	;;
+	*) echo "invalid option: '$1'" >&2; exit 2;;
+esac
+
+_rm() {
+	rm -f -- "$tmp" || [ ! -e "$tmp" ] || \
+	sleep 5        || rm -f -- "$tmp" || \
+	sleep "$sleep" || rm -f -- "$tmp"
+}
+
+tmp=$(mktemp) || exit
+# trap _rm 1 2 3 4 5 6 7 8 10 11 12 13 14 15 16 # todo: all needed?
+trap _rm 3 13 15
+printf %s\\n "$tmp"
+
+(
+	cat > "$tmp" || eval '_rm; exit '$?
+
+	{
+		sleep "$sleep"
+		_rm || \
+			printf >&2 "${0##*/} (background): can't remove temp file (exit code $?): $tmp" \
+		;
+	} &
+) 1>&2 # fork in "$(cmd)"
+
+# if [ -d '/\.\Windows\' ]; then 
+# note: bb-w32 does not have disown

@@ -1,4 +1,7 @@
 #!/bin/ash
+
+# check what does option '/savecred' do. https://superuser.com/a/904138
+
 set -eu
 : ${IFS//_/_} || exit # exit if not supported
 

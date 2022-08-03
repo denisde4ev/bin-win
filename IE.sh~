@@ -1,0 +1,5 @@
+#!/bin/sh
+IFS=$'\n'
+set -f
+env -i $(env | grep -v '=C:/') 'C:\Program Files\Internet Explorer\iexplore.exe' "$@"
+#exec env $(env | sed '/^[^=]*$/ d; s@/@\\@g') 

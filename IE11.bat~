@@ -1,0 +1,5 @@
+#!/bin/sh
+:; IFS=$'\n'; exec env $(env | sed '/^[^=]*$/ d; s@/@\\@g') "C:\Program Files\Internet Explorer\iexplore.exe" "$@"; exit;
+:;'no end
+@ECHO OFF
+"C:\Program Files\Internet Explorer\iexplore.exe" %*

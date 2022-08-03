@@ -1,0 +1,26 @@
+#!/bin/sh
+
+set -eu
+
+site=$(fzf < ~/0/j/etc/hostnames-for_c.siteip_fzf) || exit
+
+read -r site_name site_ip << .
+${site}
+.
+
+current_cip=$($ cout) || :
+
+printf %s\\n "choosen: $site_name" >&2
+{
+	printf %s "$site_ip"
+	case $current_cip in
+		http://*/*|https://*/*)
+		set -x 
+			path=${current_cip#*://}
+			path=${path#*/}
+			printf %s "$path"
+		;;
+		/*) printf %s "${current_cip#/}";;
+	esac
+	echo
+} | $ clip_io

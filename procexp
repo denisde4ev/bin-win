@@ -1,0 +1,64 @@
+#!/bin/sh
+
+#alias arg_shift_i=\
+#"shift || { echo 'Error parsing arguments' >&2; echo exit 1; };\
+#: \"\$(( i = i - 1 ))\" \
+#"
+
+
+#alias arg_break_i='shift "$i"; break' # TODO: test corner case
+
+#alias arg_break_i
+#exit 0
+
+#procexp(){ ( set -eu
+#	i=$#
+#
+#	while [ 0 -lt "$i" ]; do
+#		case $1 in
+#			#when is not num/int
+#			-s|[0-9]*)
+#				[ "$1" = -s ] && arg_shift_i
+#				set -- "$@" "\\s:$1"
+#			;;
+#			--)
+#				#arg_shift_i
+#				arg_break_i
+#				#exit 100
+#			;;
+#			*) echo "skip arg '$1' when i=$i"
+#		esac
+#
+#		arg_shift_i
+#	done
+#	echo procexp64 "$@"
+#) }
+
+########################
+
+procexp() {
+	# map args '-arg' to '/arg'
+
+
+	local IFS;IFS='
+' # new line
+	
+	procexp64 $( set -eu
+		while [ $# -ne 0 ]; do
+			case $1 in
+				#-s*) i=${1#"-s"}
+				-s|[0-9]*)
+					[ "$1" != -s ] || shift
+					printf %s\\n "/s:$1"
+				;;
+				--) printf %s\\n "$@"; break;;
+				-*) printf %s\\n "/${1#-}";;
+				*) echo "skip arg '$1' when \$#=$#" >&2;;
+			esac
+			#printf %s\\n "";
+			shift
+		done
+	)
+}
+
+[ "${0##*/}" = procexp ] && procexp "$@" # might be sourced from shell?

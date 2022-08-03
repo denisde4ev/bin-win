@@ -1,0 +1,9 @@
+#!/bin/ash
+
+
+exec cmd.exe /c "$( #"
+	for i; do
+		printf ' "%s"' "${i//"\""/"\"^\"\""}"
+		# "fix
+	done
+)"

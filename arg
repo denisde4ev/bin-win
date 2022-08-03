@@ -1,0 +1,11 @@
+#!/bin/ash
+
+[ -t 1 ] && { IFS=''; printf %s "$#:${#*} " >&2; }
+
+start_space=''
+for i; do
+#	printf %s "$i" | sed -e "s/'/'\\\\''/g" -e  "1s/^/${start_space}'/" -e "\$s/\$/'/"
+	printf %s "${start_space}'${i//"'"/"'\\''"}'"
+	start_space=' '
+done
+echo

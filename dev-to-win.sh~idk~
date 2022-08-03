@@ -1,0 +1,61 @@
+#!/bin/sh
+
+
+err() {
+	printf %s\\n "${0##*/}: $1"
+	exit "${2-2}"
+}
+
+
+d=${1#/dev/} # optionally starts with /dev
+
+case $d in sd[a-z]|sd[a-z][0-9]) ;; *)
+	err 'device is not in ?(/dev/)sd@([a-z]|sd[a-z][0-9])' 2;;
+esac
+
+case ${d#sd} in
+	a*) w_disk=0;;
+	b*) w_disk=1;;
+	c*) w_disk=2;;
+	d*) w_disk=3;;
+	e*) w_disk=4;;
+	f*) w_disk=5;;
+	g*) w_disk=6;;
+	h*) w_disk=7;;
+	i*) w_disk=8;;
+	j*) w_disk=9;;
+	k*) w_disk=10;;
+	l*) w_disk=11;;
+	m*) w_disk=12;;
+	n*) w_disk=13;;
+	o*) w_disk=14;;
+	p*) w_disk=15;;
+	q*) w_disk=16;;
+	r*) w_disk=17;;
+	s*) w_disk=18;;
+	t*) w_disk=19;;
+	u*) w_disk=20;;
+	v*) w_disk=21;;
+	w*) w_disk=22;;
+	x*) w_disk=23;;
+	y*) w_disk=24;;
+	z*) w_disk=25;;
+	*) err '$d is not in sd[a-z]*';;
+esac
+
+
+case ${d#sd[a-z]} in
+'')
+	printf %s\\n '\\.\'"PhysicalDrive$w_disk"
+	exit
+;;
+[0-9]|[0-9][0-9])
+	w_part=${d#sd[a-z]}
+
+	printf %s\\n '\\.\'"Harddisk${w_disk}Partition${w_part}"
+	exit
+esac
+
+echo nothing to do >&2
+exit 123
+

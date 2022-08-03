@@ -1,0 +1,5 @@
+#!/bin/sh
+:; exec bb env -i "C:\Program Files\Internet Explorer\iexplore.exe" "$@"; exit;
+:"noend
+@ECHO OFF
+bb env -i "C:\Program Files\Internet Explorer\iexplore.exe" %*

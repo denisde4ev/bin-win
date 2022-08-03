@@ -69,7 +69,9 @@ x)
 	esac
 
 	case ${_runinbash_arg1+x} in
-		x) exec wsl -e bash ${_runinbash_bash_args-} -c "${_runinbash_arg1} ${1+\"\$@\" #}" bash "$@";;
+		x)
+			# known bug of 'wsl' command: wsl won't accept '' / "" as argument: "The parameter is incorrect.\nash: wsl: Exec format error"
+			exec wsl -e bash ${_runinbash_bash_args-} -c "${_runinbash_arg1} ${1+\"\$@\" #}" bash "$@";;
 		*) exec bash.exe ${_runinbash_bash_args-};;
 	esac
 	;;
