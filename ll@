@@ -1,0 +1,5 @@
+#!/bin/sh
+
+# this is cached alisa/command from `i@ ll` 
+
+exec exa -alF --git --time-style iso --group-directories-first -g "$@"
