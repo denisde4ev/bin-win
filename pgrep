@@ -1,0 +1,44 @@
+#!/bin/sh
+case $1 in --xtrace|-x) set -x; shift; esac
+
+set -f
+IFS='
+'
+
+case $1 in --help)
+	printf %s\\n "Use [pslist arg]... [--] <grep arg>..."
+	exit
+esac
+
+
+psargs=''
+grepargs=''
+unset psargs_ended
+
+while case $# in 0) false ;esac; do
+	case $1 in
+		--) shift; grepargs=$grepargs$IFS$*; break;;
+		-*) psargs=$psargs$IFS$1;;
+		*) grepargs=$grepargs$IFS$*; break;;
+	esac
+	shift
+done
+
+# get pslist from `winget install 9P7KNL5RWT25` 
+pslist $psargs | {
+	while :; do
+		read -r line || {
+			printf %s\\n >&2 "can not find line matching 'Name'*"
+			exit 3
+		}
+
+		case $line in Name*)
+			if [ -t 1 ] && [ -t 2 ]; then
+				printf %s\\n >&2 "$line"
+			fi
+			break
+		esac
+	done
+
+	grep $grepargs
+}

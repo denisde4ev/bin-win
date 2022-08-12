@@ -12,7 +12,7 @@ set -euf
 
 # TODO unset unneeded vars
 
-unset _runinbash_o
+# unset _runinbash_o # allow to be exported or sourced
 unset _runinbash_bash_args
 unset _runinbash_arg1
 

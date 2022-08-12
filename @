@@ -1,1 +1,4 @@
-RunInBash.sh
+#!/bin/sh
+
+_runinbash_o=@
+. "${0%/*}"/RunInBash.sh

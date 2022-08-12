@@ -1,4 +1,4 @@
 #!/bin/sh
 
-_runinbash_o=node
+_runinbash_o=git
 . "${0%/*}"/RunInBash.sh
