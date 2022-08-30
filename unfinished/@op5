@@ -1,0 +1,47 @@
+#!/bin/sh
+
+unset TERM
+
+exec__ssh_arg1() {
+	case $1 in
+	\[*\]:*) 
+		_ssh_ip=${1#\[}
+		_ssh_ip=${_ssh_ip%%\:*}
+		_ssh_ip=${_ssh_ip%\]}
+		
+		_ssh_port=${1##*:}
+	;;
+	*)
+		_ssh_ip=$1
+	;;
+	esac
+	shift
+
+	set -x
+	exec ssh "$_ssh_ip" ${_ssh_port:+-p $_ssh_port} "$@"
+}
+
+known_hosts=$(
+	rg -v '^\s*#|\s#\(ignore\)' ~/.ssh/known_hosts \
+	| rg ' AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBPibAZwqHLgI1V3x/7vWIMqfb9aLslAgkAEx0sY4cPG2OKBZ84Km2ixQ2C7RzqIxXAXJfxnzUAp/4rz36Ou\+kUM=\r?$' \
+	| cut -d ' ' -f 1 \
+	| fzf -1
+)|| exit
+
+#exec__ssh_arg1 "$known_hosts" -o ConnectTimeout=5 "$@"
+exec__ssh_arg1 "$known_hosts" "$@"
+
+
+##| {
+##	while read -r known_host _; do
+##		ssh_arg1 "$known_host" "$@" || break
+##	done
+##}
+
+
+###ssh 192.168.1.109 -p 8022 "$@"
+
+#ssh 192.168.1.103 -p 8022 "$@"
+#ssh 192.168.1.111 -p 8022 "$@"
+#ssh 192.168.1.105 -p 8022 "$@"
+

@@ -1,0 +1,15 @@
+#!/bin/sh
+
+case $#:$2 in
+3:-v|3:--value)
+	set -- "$1" /v "$3"
+	;;
+2:-v*)
+	set -- "$1" /v "${3#-v}"
+	;;
+2:--value=*)
+	set -- "$1" /v "${3#--value=}"
+esac
+
+
+reg QUERY "$@" | sed -ne 's/.* REG_SZ *//p'

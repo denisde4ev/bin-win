@@ -40,7 +40,7 @@ main() {
 		;;
 		1)
 			echo 1
-			case $1 in "${SYSTEMDRIVE:-C:}"'\Users\pc57\usr\bin\cd__.sh') main; return ; esac
+			case $1 in "${SYSTEMDRIVE:-C:}"'\Users\pc57\usr\bin\unfinished\__.sh') main; return ; esac
 
 			echo cd -- "${1%["${PATHSEP:?}"]*}"
 			cd -- "${1%["${PATHSEP:?}"]*}"

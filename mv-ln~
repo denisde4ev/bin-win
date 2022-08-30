@@ -1,5 +1,6 @@
 #!/bin/sh
-exit 111111
+echo >&2 do not use this script
+exit 111
 o=${0##*"${PATHSEP-/}"}
 o=${0%.sh}
 
