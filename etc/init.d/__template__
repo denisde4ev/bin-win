@@ -1,0 +1,153 @@
+#!/bin/sh
+
+# ref:
+# https://raw.githubusercontent.com/charlesbrandt/init-script-template/master/template
+# https://github.com/mbilloo/percepio_phytec/blob/master/sources/poky/meta-skeleton/recipes-skeleton/service/service/skeleton
+
+
+# idk how this work, but I dont need it for now
+### _BEGIN INIT INFO_
+# Provides:          
+# Required-Start:    
+# Required-Stop:     
+# Default-Start:     
+# Default-Stop:      
+# Short-Description: 
+# Description:       
+### _END INIT INFO_
+
+dir=/
+# user=""
+cmd='echo sleeping for 1 minute; sleep 60'
+
+name=${0##*/}
+pid_file=${PREFIX-}/var/run/$name.pid
+stdout_log=${PREFIX-}/var/log/$name.log
+stderr_log=${PREFIX-}/var/log/$name.err
+
+
+
+_fix_busybox_w32_pid() {
+	# fix: busybox-w32 gives ppid of spawned command -> we got pid of  ``, but we want of startet sub process
+	# the fix is to find it, as ppid
+
+	# get child process
+	pid=${1:-${!:-${pid?}}}
+
+	ps -o pid,args "$pid" | grep "^ *$pid  *sh --fs 000\\d*" -q || {
+		case ${pid_child:+x} in '')
+			printf %s\\n >&2 "note: expected to get at least 1 pid_child of bg process (pid='$pid') with sh, but could not find it in ps output"
+		esac
+		printf %s\\n "$pid"
+		return
+	}
+
+	pid_child=$(ps -o ppid,pid "$pid" | sed -ne "/^ *$pid / { s/ * $//; s/.* //; p; }")
+	case $pid_child in *[!0-9]*|'')
+		printf %s\\n >&2 "error: failed to get child pid of pid='$pid'"
+
+		# do not simulate error, the progar have been started
+		printf %s\\n "$pid"
+		unset pid
+		return 0
+	esac
+
+	pid=$pid_child
+	_fix_busybox_w32_pid "$pid" # might get nested childs, check it again
+	#printf %s\\n "$pid"
+}
+
+
+get_pid() {
+	cat "$pid_file"
+}
+
+is_running() {
+	[ -f "$pid_file" ] || return 1
+	pid=${1:-$(get_pid)} || return 5
+	pids=$(ps -o pid "$pid" 2>&1) || return 1
+	echo "$pids" | grep -qwFe "$pid" || return 1
+}
+
+
+
+
+
+main() {
+
+action=$1; shift
+case $action in
+start)
+	if is_running; then
+		echo "Already started" >&2
+	else
+		echo Starting... >&2
+		cd "$dir" || return
+		_start_header="---- STARTING $(date) ----"${1+", additional args: $*"}
+		printf %s\\n "" "$_start_header" >> "$stdout_log"
+		printf %s\\n "" "$_start_header" >> "$stderr_log"
+		eval "$cmd" >>"$stdout_log" 2>>"$stderr_log" &
+		_fix_busybox_w32_pid $! > "$pid_file"
+		is_running || {
+			printf %s\\n "Unable to start" "see '$stdout_log' and '$stderr_log' linesafter header: '$_start_header'" >&2
+			return 1
+		}
+	fi
+	;;
+stop)
+	is_running || {
+		echo Not running
+		return
+	}
+	printf %s Stopping.. >&2
+
+	kill "$@" $(get_pid)
+
+	for i in 1 2 3 4 5 6 7 8 9 0; do
+		is_running "$pid" || break
+
+		printf . >&2 
+		sleep 1
+	done
+	echo >&2
+	
+	if is_running "$pid"; then
+		echo "Not stopped; may still be shutting down or shutdown may have failed" >&2
+		return 1
+	else
+		echo Stopped
+		if [ -f "$pid_file" ]; then
+			rm "$pid_file"
+		fi
+	fi
+	;;
+restart)
+	main stop
+	! is_running || {
+		echo "Unable to stop, will not attempt to start" >&2
+		return 1
+	}
+	main start
+	;;
+status)
+	if is_running; then
+		echo Running
+		return 0 # echo might fail (when stdout is closed)
+	else
+		echo Stopped
+		return 1
+	fi
+	;;
+
+--help)
+	printf %s\\n "Usage: $0 {start|stop|restart|status}"
+	;;
+*)
+	printf %s\\n "Usage: $0 {start|stop|restart|status}" >&2
+	return 1
+	;;
+esac
+
+
+}
+main "$@"
