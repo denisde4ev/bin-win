@@ -6,10 +6,10 @@ case ${1:-} in '');;
 	[0-9]*|.[0-9]*) sleep=$1; shift;; # arg looks lake num or 1m or .1
 	-h|--help)
 		printf %s\\n \
-			"Usage ${0##*/} [timeout for temp file]" \
-			'  1. save stdin to temp file' \
-			'  2. echo path to temp file' \
-			'  3. remove temp file after timeout (retry if rm fails)' \
+			"Usage STDIN | ${0##*/} [timeout for temp file]" \
+			'  * save stdin to temp file' \
+			'  * echo path to temp file' \
+			'  * remove temp file after timeout (retry if rm fails)' \
 			'' \
 			"  default timeout: $sleep" \
 		;
