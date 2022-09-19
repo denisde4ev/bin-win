@@ -1,0 +1,7 @@
+NAME=Cygwin
+VERSION="??"
+ID=cygwin
+VERSION_ID="??"
+PRETTY_NAME="Cygwin"
+HOME_URL="https://cygwin.com/"
+SUPPORT_URL="https://cygwin.com/"

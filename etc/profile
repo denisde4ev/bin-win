@@ -1,0 +1,6 @@
+#!/hint/sh
+
+export PREFIX=~/usr
+# echo 1
+
+. "$PREFIX"/root/B.win/_main
