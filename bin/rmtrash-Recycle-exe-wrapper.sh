@@ -2,6 +2,9 @@
 # SH wrapper FOR Windows Recycle.exe
 # SH +(replace sh extension) -> target shells ash/yash/bash/zsh
 
+# todo: rmtrash-restore-Recycle-exe-wrapper.sh using `RECYCLE /U "C:\temp\junk.txt"`
+
+
 #local IFS=' '
 IFS=' '; set -f
 case ${@:-} in --help) echo todo: help message; exit; esac
