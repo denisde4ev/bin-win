@@ -1,0 +1,45 @@
+#!/bin/sed -ne 8,41p
+`$ notepad++ --help` will open GUI message
+- note: message has no \n but has \r as new line: fix by `$ tr \\r \\n`
+
+---------------------------
+Notepad++ Command Argument Help
+---------------------------
+Usage :
+
+notepad++ [--help] [-multiInst] [-noPlugin] [-lLanguage] [-udl="My UDL Name"] [-LlangCode] [-nLineNumber] [-cColumnNumber] [-pPosition] [-xLeftPos] [-yTopPos] [-monitor] [-nosession] [-notabbar] [-ro] [-systemtray] [-loadingTime] [-alwaysOnTop] [-openSession] [-r] [-qn="Easter egg name" | -qt="a text to display." | -qf="D:\my quote.txt"] [-qSpeed1|2|3] [-quickPrint] [-settingsDir="d:\your settings dir\"] [-openFoldersAsWorkspace]  [-titleAdd="additional title bar text"][filePath]
+
+--help : This help message
+-multiInst : Launch another Notepad++ instance
+-noPlugin : Launch Notepad++ without loading any plugin
+-l : Open file or Ghost type with syntax highlighting of choice
+-udl="My UDL Name": Open file by applying User Defined Language
+-L : Apply indicated localization, langCode is browser language code
+-n : Scroll to indicated line on filePath
+-c : Scroll to indicated column on filePath
+-p : Scroll to indicated position on filePath
+-x : Move Notepad++ to indicated left side position on the screen
+-y : Move Notepad++ to indicated top position on the screen
+-monitor: Open file with file monitoring enabled
+-nosession : Launch Notepad++ without previous session
+-notabbar : Launch Notepad++ without tabbar
+-ro : Make the filePath read only
+-systemtray : Launch Notepad++ directly in system tray
+-loadingTime : Display Notepad++ loading time
+-alwaysOnTop : Make Notepad++ always on top
+-openSession : Open a session. filePath must be a session file
+-r : Open files recursively. This argument will be ignored
+     if filePath contain no wildcard character
+-qn="Easter egg name": Ghost type easter egg via its name
+-qt="text to display.": Ghost type the given text
+-qf="D:\my quote.txt": Ghost type a file content via the file path
+-qSpeed : Ghost typing speed. Value from 1 to 3 for slow, fast and fastest
+-quickPrint : Print the file given as argument then quit Notepad++
+-settingsDir="d:\your settings dir\": Override the default settings dir
+-openFoldersAsWorkspace: open filePath of folder(s) as workspace
+-titleAdd="string": add string to Notepad++ title bar
+filePath : file or folder name to open (absolute or relative path name)
+
+---------------------------
+OK   
+---------------------------
