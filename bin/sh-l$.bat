@@ -1,3 +1,5 @@
 @ECHO OFF
-set OLDPWD=%CD%
-busybox64.exe  ash -l -c "com=$1;shift;eval "^""$com"^""${1:+' "^""$@"^""'}" -s %*
+
+set NON_INTERACTIVE=1
+set ENV=%PREFIX%/etc/profile
+busybox64.exe  ash -i -c "com=$1;shift;eval "^""$com"^""${1:+' "^""$@"^""'}" -s %*

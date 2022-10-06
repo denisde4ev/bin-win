@@ -1,0 +1,19 @@
+#!/bin/sh
+
+
+case $1 in --help)
+printf %s\\n "Usage: ${0##*/} <new commit> <branch>" "WILL SWITCH TO THAT BRANCH, (currently no known way to do it without switching to it)"
+exit
+esac
+
+case $# in 2) ;; *)
+printf %s\\n >&2 'see --hepl for usage'
+exit 2
+esac
+
+
+git checkout "$1" && \
+git branch -D "$2" && \
+git checkout "$1" && \
+git branch "$2" && \
+git switch "$2"

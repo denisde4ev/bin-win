@@ -1,0 +1,5 @@
+#!/bin/sh
+
+printf %s\\n >&2 "${2+"$2 "}(exit status: $1)"
+pause
+exit $1
