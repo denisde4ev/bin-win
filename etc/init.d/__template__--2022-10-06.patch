@@ -1,0 +1,61 @@
+diff --git a/etc/init.d/freeVD b/etc/init.d/freeVD
+index 94a34ca..affa918 100644
+--- a/etc/init.d/freeVD
++++ b/etc/init.d/freeVD
+@@ -38,6 +38,8 @@ _fix_busybox_w32_pid() {
+ 	pid=${1:-${!:-${pid?}}}
+ 	tries=${2:-1}
+ 
++
++	# TODO:! SWAP PID AND PPID  (in case ps is sorting headers or just igneres it) { todo: 'ps -o pid,args' -> 'ps -o args,pid' }
+ 	ps -o pid,args "$pid" | grep -Ee "^ *$pid  *(sh --fs 000\\d*|cmd\\.exe)" -q || {
+ 		{
+ 			case ${pid_child:+x} in '')
+@@ -80,6 +82,7 @@ get_pid() {
+ is_running() {
+ 	[ -f "$pid_file" ] || return 1
+ 	pid=${1:-$(get_pid)} || return 5
++	case $pid in ''|*[!0-9]*) return 2; esac
+ 	pids=$(ps -o pid "$pid" 2>&1) || return 1
+ 	echo "$pids" | grep -qwFe "$pid" || return 1
+ }
+@@ -94,15 +97,25 @@ action=$1; shift
+ case $action in
+ start)
+ 	if is_running; then
+-		echo "Already started" >&2
++		echo "Already started"
+ 	else
+-		echo Starting... >&2
++		printf %s Starting
++		printf %s ... >&2
++		printf \\n
+ 		cd "$dir" || return
+ 		_start_header="---- STARTING $(date) ----"${1+", additional args: $*"}
+ 		printf %s\\n "" "$_start_header" >> "$stdout_log"
+ 		printf %s\\n "" "$_start_header" >> "$stderr_log"
+-		eval "$cmd" >>"$stdout_log" 2>>"$stderr_log" &
+-		_fix_busybox_w32_pid $! > "$pid_file"
++		pid=$(
++			{ # TODO:! move this to bg-start-to-pid
++				{
++					eval "$cmd" 0<&- 1>>"$stdout_log" 2>>"$stderr_log" &
++					echo $! >&3
++				} | :
++			} 3>&1 | head -1
++		)
++		echo >&2 pid=$pid
++		_fix_busybox_w32_pid $pid > "$pid_file"
+ 		is_running || {
+ 			printf %s\\n >&2 \
+ 				"Unable to start: '$cmd'" \
+@@ -118,7 +131,8 @@ stop)
+ 		echo Not running
+ 		return
+ 	}
+-	printf %s Stopping.. >&2
++	printf %s Stopping
++	printf %s .. >&2
+ 
+ 	eval "${stop_cmd:-'kill "$@" $pid'}"
+ 
