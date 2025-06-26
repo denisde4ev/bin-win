@@ -1,5 +1,6 @@
 #!/bin/sh
 set -eu
+case $1 in -x) shift; set -x; esac
 
 # note: command-inplace and xargs-inplace shares some codebase
 # if you edit this consider if that change should be added to other command too
@@ -42,14 +43,14 @@ case ${command-} in '') printf %s\\ "missing COMMAND, see --help for usage" >&2;
 #
 for file; do
 	# TODO: add  trap to remov file
-	eval "$command" < "$file" > "$file~i.$$~" || {
+	eval "$command" < "$file" > "$file~command-inplace.$$~" || {
 		printf %s\\n "${0##*/}: for file '$file' command eval exit status: $?"
-		rm -v -- "$file~i.$$~"
+		rm -v -- "$file~command-inplace.$$~"
 		continue
 	}
 
 	case ${MV_COMMAND_SUPPORTS_ARGT+T} in T) ;; *)
 		[ ! -d "$file" ] || rm -v -- "$file" || continue
 	esac
-	mv -vf${MV_COMMAND_SUPPORTS_ARGT+T} -- "$file~i.$$~" "$file"
+	mv -vf${MV_COMMAND_SUPPORTS_ARGT+T} -- "$file~command-inplace.$$~" "$file"
 done
